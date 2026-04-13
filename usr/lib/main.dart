@@ -1,123 +1,464 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'dart:async';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const TrainRouteOptimizerApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class TrainRouteOptimizerApp extends StatelessWidget {
+  const TrainRouteOptimizerApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Train Route Optimizer',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        primaryColor: const Color(0xFF1E88E5), // Blue header
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF1E88E5),
+          primary: const Color(0xFF1E88E5),
+          secondary: const Color(0xFF43A047), // Green button
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF43A047),
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+            textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF1E88E5),
+          foregroundColor: Colors.white,
+          centerTitle: true,
+          elevation: 0,
+        ),
       ),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const MyHomePage(title: 'Flutter Demo Home Page'),
-      },
+      home: const LoginScreen(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+// --- Background Widget ---
+class GradientBackground extends StatelessWidget {
+  final Widget child;
+  const GradientBackground({super.key, required this.child});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xFFE3F2FD), Color(0xFFBBDEFB)],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+      ),
+      child: child,
+    );
+  }
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+// --- Login Screen ---
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
+  String _errorMessage = '';
+
+  void _login() {
+    if (_usernameController.text == 'admin' && _passwordController.text == '1234') {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const DashboardScreen()),
+      );
+    } else {
+      setState(() {
+        _errorMessage = 'Invalid username or password';
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text('$_counter', style: Theme.of(context).textTheme.headlineMedium),
-          ],
+      appBar: AppBar(title: const Text('🚆 Train System Login')),
+      body: GradientBackground(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24.0),
+            child: Card(
+              elevation: 8,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              child: Padding(
+                padding: const EdgeInsets.all(32.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.train, size: 64, color: Color(0xFF1E88E5)),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Admin Login',
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 32),
+                    TextField(
+                      controller: _usernameController,
+                      decoration: const InputDecoration(
+                        labelText: 'Username',
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.person),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: _passwordController,
+                      obscureText: true,
+                      decoration: const InputDecoration(
+                        labelText: 'Password',
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.lock),
+                      ),
+                    ),
+                    if (_errorMessage.isNotEmpty) ...[
+                      const SizedBox(height: 16),
+                      Text(_errorMessage, style: const TextStyle(color: Colors.red)),
+                    ],
+                    const SizedBox(height: 32),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _login,
+                        child: const Text('LOGIN'),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+}
+
+// --- Dashboard Screen ---
+class DashboardScreen extends StatelessWidget {
+  const DashboardScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('🚆 Dashboard')),
+      body: GradientBackground(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'Welcome to Train System',
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Color(0xFF1565C0)),
+              ),
+              const SizedBox(height: 48),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.map),
+                label: const Text('Find Route'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const RouteFinderScreen()),
+                  );
+                },
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                icon: const Icon(Icons.exit_to_app),
+                label: const Text('Exit'),
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// --- Route Finder Screen ---
+class RouteFinderScreen extends StatefulWidget {
+  const RouteFinderScreen({super.key});
+
+  @override
+  State<RouteFinderScreen> createState() => _RouteFinderScreenState();
+}
+
+class _RouteFinderScreenState extends State<RouteFinderScreen> {
+  final List<String> stations = ['Pune', 'Mumbai', 'Nashik', 'Nagpur', 'Delhi'];
+  String? sourceStation;
+  String? destStation;
+  
+  bool isLoading = false;
+  String resultText = '';
+  List<dynamic> trainDetails = [];
+
+  final Graph graph = Graph();
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize Graph
+    graph.addEdge('Pune', 'Mumbai', 150, 3.0);
+    graph.addEdge('Mumbai', 'Nashik', 170, 3.5);
+    graph.addEdge('Nashik', 'Nagpur', 700, 12.0);
+    graph.addEdge('Nagpur', 'Delhi', 1100, 18.0);
+    graph.addEdge('Pune', 'Nashik', 210, 4.5);
+    graph.addEdge('Mumbai', 'Delhi', 1400, 24.0);
+    graph.addEdge('Pune', 'Nagpur', 710, 14.0);
+  }
+
+  Future<void> _findRoute() async {
+    if (sourceStation == null || destStation == null) {
+      setState(() {
+        resultText = 'Please select both source and destination.';
+        trainDetails = [];
+      });
+      return;
+    }
+
+    if (sourceStation == destStation) {
+      setState(() {
+        resultText = 'Source and destination cannot be the same.';
+        trainDetails = [];
+      });
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+      resultText = 'Fetching data...';
+      trainDetails = [];
+    });
+
+    // Simulate API delay
+    await Future.delayed(const Duration(seconds: 1));
+
+    // Dijkstra's Algorithm
+    var result = graph.findShortestPath(sourceStation!, destStation!);
+
+    // Mock API Call for train details
+    var mockApiResponse = await _fetchTrainDetails(sourceStation!, destStation!);
+
+    setState(() {
+      isLoading = false;
+      if (result['path'].isEmpty) {
+        resultText = 'No route found between $sourceStation and $destStation.';
+      } else {
+        String pathStr = result['path'].join(' ➔ ');
+        resultText = \'\'\'
+🛤️ Shortest Path: $pathStr
+📏 Total Distance: ${result['distance']} km
+⏱️ Estimated Time: ${result['time']} hours
+\'\'\';
+        trainDetails = mockApiResponse;
+      }
+    });
+  }
+
+  Future<List<dynamic>> _fetchTrainDetails(String source, String dest) async {
+    // Mock JSON API response
+    String jsonString = \'\'\'
+    [
+      {"trainName": "Express 101", "departure": "10:00 AM", "status": "On Time"},
+      {"trainName": "Superfast 202", "departure": "02:30 PM", "status": "Delayed"}
+    ]
+    \'\'\';
+    return jsonDecode(jsonString);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('🚆 Route Finder')),
+      body: GradientBackground(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Card(
+                elevation: 4,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      DropdownButtonFormField<String>(
+                        decoration: const InputDecoration(labelText: 'Source Station', border: OutlineInputBorder()),
+                        value: sourceStation,
+                        items: stations.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+                        onChanged: (val) => setState(() => sourceStation = val),
+                      ),
+                      const SizedBox(height: 16),
+                      DropdownButtonFormField<String>(
+                        decoration: const InputDecoration(labelText: 'Destination Station', border: OutlineInputBorder()),
+                        value: destStation,
+                        items: stations.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+                        onChanged: (val) => setState(() => destStation = val),
+                      ),
+                      const SizedBox(height: 24),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          icon: const Icon(Icons.search),
+                          label: const Text('Find Route'),
+                          onPressed: isLoading ? null : _findRoute,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Expanded(
+                child: Card(
+                  elevation: 4,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: isLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : SingleChildScrollView(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('Route Results:', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                                const Divider(),
+                                const SizedBox(height: 8),
+                                Text(
+                                  resultText,
+                                  style: const TextStyle(fontSize: 16, height: 1.5),
+                                ),
+                                if (trainDetails.isNotEmpty) ...[
+                                  const SizedBox(height: 16),
+                                  const Text('Available Trains:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                  const SizedBox(height: 8),
+                                  ...trainDetails.map((train) => ListTile(
+                                    leading: const Icon(Icons.train, color: Colors.blue),
+                                    title: Text(train['trainName']),
+                                    subtitle: Text('Departure: ${train['departure']}'),
+                                    trailing: Text(
+                                      train['status'],
+                                      style: TextStyle(
+                                        color: train['status'] == 'On Time' ? Colors.green : Colors.red,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  )),
+                                ]
+                              ],
+                            ),
+                          ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// --- Algorithm Logic ---
+
+class Edge {
+  final String destination;
+  final int distance;
+  final double time;
+
+  Edge(this.destination, this.distance, this.time);
+}
+
+class Graph {
+  final Map<String, List<Edge>> adjList = {};
+
+  void addEdge(String source, String destination, int distance, double time) {
+    adjList.putIfAbsent(source, () => []).add(Edge(destination, distance, time));
+    adjList.putIfAbsent(destination, () => []).add(Edge(source, distance, time)); // Undirected graph
+  }
+
+  Map<String, dynamic> findShortestPath(String start, String end) {
+    if (start == end) {
+      return {'path': [start], 'distance': 0, 'time': 0.0};
+    }
+
+    var distances = <String, int>{};
+    var times = <String, double>{};
+    var previous = <String, String>{};
+    
+    // Simple priority queue using a list and sorting
+    var pq = <MapEntry<String, int>>[];
+
+    for (var node in adjList.keys) {
+      distances[node] = 999999;
+      times[node] = 999999.0;
+    }
+
+    distances[start] = 0;
+    times[start] = 0.0;
+    pq.add(MapEntry(start, 0));
+
+    while (pq.isNotEmpty) {
+      pq.sort((a, b) => a.value.compareTo(b.value));
+      var current = pq.removeAt(0).key;
+
+      if (current == end) break;
+
+      for (var edge in adjList[current] ?? <Edge>[]) {
+        var newDist = distances[current]! + edge.distance;
+        if (newDist < distances[edge.destination]!) {
+          distances[edge.destination] = newDist;
+          times[edge.destination] = times[current]! + edge.time;
+          previous[edge.destination] = current;
+          
+          // Update or add to PQ
+          pq.removeWhere((entry) => entry.key == edge.destination);
+          pq.add(MapEntry(edge.destination, newDist));
+        }
+      }
+    }
+
+    if (!previous.containsKey(end)) {
+      return {'path': [], 'distance': 0, 'time': 0.0};
+    }
+
+    List<String> path = [];
+    String? curr = end;
+    while (curr != null) {
+      path.insert(0, curr);
+      curr = previous[curr];
+    }
+
+    return {
+      'path': path,
+      'distance': distances[end],
+      'time': times[end],
+    };
   }
 }
